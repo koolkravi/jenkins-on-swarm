@@ -17,4 +17,4 @@ sudo docker run hello-world
 
 echo "Step 3: Configure docker to start on boot"
 sudo systemctl enable docker
-systemctl start docker
+sudo  systemctl start docker
