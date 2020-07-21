@@ -3,17 +3,16 @@ Setup jenkins  on Docker Swarm
 # Pre-requisite
 
 ## Create 3 vm 
-
-``
-vagrant up
 ```
+vagrant up
+
 	ips
 	10.0.0.5
 	10.0.0.6
 	10.0.0.7
+```
 	
-## Setup NFS Server and client
-   Ref: 1-nfsmount.md
+## Setup NFS Server and client (Ref: 1-nfsmount.md)
  
 ## Pre-requisite [https://github.com/koolkravi/docker-swarm/blob/master/docker-swarm-deploy-stack-part2.md]
  
@@ -22,7 +21,6 @@ vagrant up
 ## Install Docker Compose  (3-install-docker-compose.sh)
 
 ## Run docker without sudo
-
 ```
 sudo setfacl -m user:$USER:rw /var/run/docker.sock
 ```
@@ -30,18 +28,15 @@ sudo setfacl -m user:$USER:rw /var/run/docker.sock
 ## Setup swarm Manager and workder node (4-create_swarm_manager_and_add_worker.md)
 
 ## Setup a docker registry (5-docker-registry.md) from master node 10.0.0.6
-  
 
 # Jenkins Installation Steps
 
 ## Step 1:  Create Docker file
-
 ```
 jenkins/Dockerfile
 ```
 
 ## Step 2:  Build and Run
-
 ```
 docker build -t myjenkins .
 docker stop jenkins-master
@@ -50,13 +45,11 @@ docker run -p 8080:8080 --name=jenkins-master -d myjenkins
 ```
 
 ### tail log file
-
 ```
 docker exec jenkins-master tail -f /var/log/jenkins/jenkins.log
 ```
 
 ### Retrieve logs if jenkins crashes
-
 ```
 docker stop jenkins-master
 docker cp jenkins-master:/var/log/jenkins/jenkins.log jenkins.log
@@ -66,7 +59,6 @@ cat jenkins.log
 ## Step 3: Persist Docker data with volume
 
 ### Approach 1
-
 ```
 #docker volume create jenkins-data
 ```
@@ -83,14 +75,13 @@ docker exec jenkins-master cat /var/log/jenkins/jenkins.log
 docker exec jenkins-master ls /var/cache/jenkins/war
 ```
 
-```
 ### copy data if you have lost the container
+```
 docker run -d --name mylogcopy --mount source=jenkins-log,target=/var/log/jenkins debian:stretch
 docker cp mylogcopy:/var/log/jenkins/jenkins.log jenkins.log
 ```
 
 ### Approcah 2: NFS Mount point as persistent volume   
-
 ```
 docker volume create -d local-persist -o mountpoint=/opt/jenkins/data/jenkins_home/ --name=jenkins-home
 ```
@@ -101,12 +92,10 @@ docker rm jenkins-master
 
 docker run -p 8080:8080 -p 50000:50000 --name=jenkins-master -v jenkins-home:/var/jenkins_home -d myjenkins
 
-# docker run -p 8080:8080 -p 50000:50000 --name=jenkins-master --mount source=jenkins-log,target=/var/log/jenkins -v jenkins-home:/var/jenkins_home -d myjenkins
+#docker run -p 8080:8080 -p 50000:50000 --name=jenkins-master --mount source=jenkins-log,target=/var/log/jenkins -v jenkins-home:/var/jenkins_home -d myjenkins
 ````
 
-
 ## Step 4: NGINX Proxy in front of jenkins
-
 ```
 /jenkins-nginx/Dockerfile
 ```
@@ -118,12 +107,11 @@ docker run -p 8080:8080 -p 50000:50000 --name=jenkins-master -v jenkins-home:/va
 
 ```
 docker build -t myjenkinsnginx jenkins-nginx/.
-
 ```
 
 ### MAKE A DOCKER NETWORK SO NGINX CAN TALK TO JENKINS
 
-We want to create a network between our two containers so that they can easily find each other. One reason theyíll be able to easily find each other is Docker networks offer something they call ìautomatic service discovery.î Which is fancy speak for creating DNS names on the network that match the container names you create. 
+We want to create a network between our two containers so that they can easily find each other. One reason they‚Äôll be able to easily find each other is Docker networks offer something they call ‚Äúautomatic service discovery.‚Äù Which is fancy speak for creating DNS names on the network that match the container names you create. 
 This is why our NGINX config file references jenkins-master. Docker will handle making that DNS entry for us when our container attaches to the network
 
 ```
@@ -132,20 +120,17 @@ docker network ls
 ```
 
 ### BUILD THE NGINX IMAGE AND LINK IT TO THE JENKINS IMAGE
-
 ```
 docker stop jenkins-master
 docker rm jenkins-master
 ```
 
-### restart our Jenkins master container, but attach it to the network this time:
-
+### restart our Jenkins master container, but attach it to the network this time
 ```
 docker run -p 8080:8080 -p 50000:50000 --name=jenkins-master --network jenkins-net --mount source=jenkins-log,target=/var/log/jenkins --mount source=jenkins-data,target=/var/jenkins_home -d myjenkins
 ```
 
 ### build start the NGINX container and attach it to jenkins-master
-
 ```
 docker build -t myjenkinsnginx jenkins-nginx/.
 docker run -p 80:80 --name=jenkins-nginx --network jenkins-net -d myjenkinsnginx
@@ -155,13 +140,12 @@ docker run -p 80:80 --name=jenkins-nginx --network jenkins-net -d myjenkinsnginx
 ```
 http://localhost
 curl http://localhost:8000 
-
 ```
 
 ### JENKINS IMAGE CLEANUP
 
-e have NGINX listening on port 80, we donít need the Jenkins image or container to expose port 8080. 
-Letís remove that exposure by removing the port option when we start the container
+e have NGINX listening on port 80, we don‚Äôt need the Jenkins image or container to expose port 8080. 
+Let‚Äôs remove that exposure by removing the port option when we start the container
 
 ```
 docker stop jenkins-master
@@ -169,8 +153,7 @@ docker rm jenkins-master
 docker run -p 50000:50000 --name=jenkins-master --network jenkins-net --mount source=jenkins-log,target=/var/log/jenkins --mount source=jenkins-data,target=/var/jenkins_home -d myjenkins
 ```
 
-### 
-
+### Test
 ```
 curl http://localhost
 ```
@@ -212,15 +195,13 @@ docker-compose build
 docker-compose -p jenkins up -d
 ```
 
--p option, give ìprojectî a name, jenkins
-
+-p option, give ‚Äúproject‚Äù a name, jenkins
 
 ```
 docker-compose -p jenkins ps
 ```
 
-### Docker Compose tears down your network (because it can be easily recreated) but doesnít remove your volume. When it comes up again it recreates the network and doesnít bother with the volume
-
+### Docker Compose tears down your network (because it can be easily recreated) but doesn‚Äôt remove your volume. When it comes up again it recreates the network and doesn‚Äôt bother with the volume
 ```
 docker-compose -p jenkins down
 ```
@@ -230,19 +211,11 @@ to delete volume as well the pass -v option
 docker-compose -p jenkins down -v
 ```
 
-
 ### TEST
 
 ```
 curl http://localhost
 ```
-
-
-
-
-
-
-
 
 
 
