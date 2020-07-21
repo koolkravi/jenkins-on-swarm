@@ -12,22 +12,28 @@ vagrant up
 	10.0.0.7
 ```
 	
-## Setup NFS Server and client (Ref: 1-nfsmount.md)
+## Setup NFS Server and client 
+(Ref: 1-nfsmount.md)
  
-## Pre-requisite [https://github.com/koolkravi/docker-swarm/blob/master/docker-swarm-deploy-stack-part2.md]
+## Pre-requisite 
+[https://github.com/koolkravi/docker-swarm/blob/master/docker-swarm-deploy-stack-part2.md]
  
-## Install docker  (2-install-docker.sh)
+## Install docker  
+(2-install-docker.sh)
 
-## Install Docker Compose  (3-install-docker-compose.sh)
+## Install Docker Compose  
+(3-install-docker-compose.sh)
 
 ## Run docker without sudo
 ```
 sudo setfacl -m user:$USER:rw /var/run/docker.sock
 ```
 
-## Setup swarm Manager and workder node (4-create_swarm_manager_and_add_worker.md)
+## Setup swarm Manager and workder node 
+(4-create_swarm_manager_and_add_worker.md)
 
-## Setup a docker registry (5-docker-registry.md) from master node 10.0.0.6
+## Setup a docker registry 
+(5-docker-registry.md) from master node 10.0.0.6
 
 # Jenkins Installation Steps
 
@@ -222,8 +228,9 @@ curl http://localhost
 
 
 
-# Ref
-## https://technology.riotgames.com/news/putting-jenkins-docker-container
+# Reference
+## 1. putting-jenkins-docker-container
+https://technology.riotgames.com/news/putting-jenkins-docker-container
 
 ```
 docker pull jenkins/jenkins
@@ -248,11 +255,20 @@ docker run -p 8080:8080 --name=jenkins-master -d --env JAVA_OPTS="-Xmx8192m" --e
 docker exec jenkins-master ps -ef | grep java
 ```
 
-## Defaulkt docker file : https://github.com/Jenkinsci/docker/blob/master/Dockerfile
-## https://github.com/jenkinsci/docker/blob/master/README.md
-## Jenkins behind an NGinX reverse proxy: https://wiki.jenkins.io/display/JENKINS/Jenkins+behind+an+NGinX+reverse+proxy
-## Docker network : https://docs.docker.com/network/
-## How to Do Basic Debugging With Docker Compose : https://www.matthewsetter.com/basic-docker-compose-debugging/
+## 2. Defaulkt docker file : 
+https://github.com/Jenkinsci/docker/blob/master/Dockerfile
+
+## 3. jenkinsci docker blob
+https://github.com/jenkinsci/docker/blob/master/README.md
+
+## 4. Jenkins behind an NGinX reverse proxy: 
+https://wiki.jenkins.io/display/JENKINS/Jenkins+behind+an+NGinX+reverse+proxy
+
+## 5. Docker network : 
+https://docs.docker.com/network/
+
+## 6. How to Do Basic Debugging With Docker Compose : 
+https://www.matthewsetter.com/basic-docker-compose-debugging/
 ```
 docker-compose -p jenkins up -d
 docker-compose -p jenkins ps
